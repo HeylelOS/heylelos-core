@@ -1,0 +1,47 @@
+#!/bin/sh
+
+set -e
+umask 022
+
+[ ! -z $1 ]
+[ ! -z $2 ]
+version=$1
+environment=$2
+
+syslibdir="/library/$environment"
+
+cd builds
+
+echo "I: Building musl libc"
+
+echo "- Fetching latest libc"
+if [ ! -d libc ]
+then
+	git clone 'git://git.musl-libc.org/musl' libc
+	mkdir libc-build
+	touch libc-build/latest
+fi
+
+echo "- Building libc"
+cd libc
+git pull --autostash -r origin master
+git checkout -f "v$version"
+
+cd ../libc-build
+if [ $version = "`cat latest`" ]
+then echo "- Last build up-to-date"
+else
+	echo '- Applying /etc -> /persistent "patch"'
+	sed -i -e 's/\/etc/\/persistent/g' `find ../libc -type f`
+
+	echo "- Applying /lib/ld-musl-\$(ARCH)\$(SUBARCH) -> $syslibdir/ld.so"
+	sed -i -e 's/LDSO_PATHNAME = .*/LDSO_PATHNAME = $(syslibdir)\/ld.so/g' ../libc/Makefile
+
+	echo "- Configurating build"
+	../libc/configure --srcdir=../libc "--prefix=/hub/musl-$version" "--syslibdir=$syslibdir" > build.log 2>&1
+	echo "- Making build (may take a while)"
+	make -j $((`nproc` * 2)) >> build.log 2>&1
+
+	echo $version > latest
+fi
+

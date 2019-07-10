@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+umask 022
+
+[ ! -z $1 ]
+hostname=$1
+image=$hostname.img
+
+qemu-img create $image 1G
+mkdir root
+mkfs.btrfs -L $hostname $image
+sudo mount $image root
+sudo mkdir -p root/bin root/boot root/dev root/hub root/library\
+ 	root/mounts root/opt root/persistent root/proc root/root\
+ 	root/sbin root/sys root/system root/tmp root/users root/var
+sudo chmod go+rwxt root/mounts root/tmp
+sudo umount root
+rmdir root
+
+echo "- Successfully Created $hostname.img HeylelOS image"
+

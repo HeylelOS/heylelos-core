@@ -1,0 +1,69 @@
+#!/bin/sh
+
+set -e
+umask 022
+
+[ ! -z $1 ]
+[ ! -z $2 ]
+version=$1
+hostname=$2
+
+cd builds
+
+echo "II: Linux kernel and HeylelOS initramfs"
+
+echo "- Fetching latest kernel"
+if [ ! -d kernel ]
+then
+	git clone 'https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git' kernel
+	mkdir kernel-build
+	touch kernel-build/latest
+fi
+
+echo "- Fetching HeylelOS initramfs"
+if [ ! -d initramfs ]
+then
+	git clone 'https://github.com/HeylelOS/initramfs' initramfs
+	mkdir initramfs-build
+fi
+
+echo "- Building initramfs"
+cd initramfs
+git pull
+[ ! -f Makefile ] && ./configure -r
+make build/bin/init
+cd ../initramfs-build
+rm -rf ./*
+mkdir dev mnt
+cp ../initramfs/build/bin/init init
+strip init
+cd ..
+
+echo "- Building kernel"
+cd kernel
+git pull --autostash -r origin master
+git checkout -f "v$version"
+
+cd ../kernel-build
+if [ $version = "`cat latest`" ]
+then echo "- Kernel image is up-to-date"
+else
+	echo "- Distclean kernel source tree"
+	make -C ../kernel distclean > build.log 2>&1
+
+	echo "- Applying custom .config"
+	cat - ../../misc/kernel/linux-.config <<EOF > ../kernel/.config
+CONFIG_DEFAULT_HOSTNAME="$hostname"
+CONFIG_INITRAMFS_ROOT_UID=`id -u`
+CONFIG_INITRAMFS_ROOT_GID=`id -g`
+EOF
+
+	echo "- Making build (may take a freaking while)"
+	# yes n is here in case the kernel had options updates, so we deactivate everything unknown yet
+	yes n | make -C ../kernel -j $((`nproc` * 2)) >> build.log 2>&1
+	cp "../kernel/arch/`uname -m`/boot/bzImage" "vmlinuz-$version"
+
+	echo "$version" > latest
+fi
+cd ..
+
