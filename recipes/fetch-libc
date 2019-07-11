@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -e
+umask 022
+
+echo "FETCH: libc"
+
+[ -z "$LIBC_MUSL_VERSION" ] && echo 'error: Expected $LIBC_MUSL_VERSION' && exit 1
+
+cd workbench
+
+echo "- Fetching latest libc"
+if [ ! -d libc ]
+then
+	git clone 'git://git.musl-libc.org/musl' libc
+	touch libc-latest
+fi
+
+cd libc
+git pull --autostash -r origin master
+git checkout -f "v$LIBC_MUSL_VERSION"
+cd ..
+

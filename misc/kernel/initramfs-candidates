@@ -1,2 +1,0 @@
-sda btrfs defaults /bin/sh /persistent/fstab
-sda btrfs ro /bin/sh none

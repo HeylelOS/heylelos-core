@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -e
+umask 022
+
+echo "BUILD: libc"
+
+[ -z "$LIBC_MUSL_VERSION" ] && echo 'error: Expected $LIBC_MUSL_VERSION' && exit 1
+[ -z "$ALL_TARGET_IDENTIFIER" ] && echo 'error: Expected $ALL_TARGET_IDENTIFIER' && exit 1
+
+cd workbench
+
+echo "- Building libc"
+if [ $LIBC_MUSL_VERSION = "`cat libc-latest`" ]
+then echo "- Libc build is up-to-date"
+else
+	echo '- Applying /etc -> /persistent "patch"'
+	sed -i -e 's/\/etc/\/persistent/g' `find libc -type f`
+
+	echo '- Applying /lib/ld-musl-$(ARCH)$(SUBARCH) -> $(syslibdir)/ld.so'
+	sed -i -e 's/LDSO_PATHNAME = .*/LDSO_PATHNAME = $(syslibdir)\/ld.so/g' libc/Makefile
+
+	echo "- Configurating build"
+	cd libc
+	./configure "--prefix=/hub/musl-$LIBC_MUSL_VERSION" \
+		"--syslibdir=/library/$ALL_TARGET_IDENTIFIER" > libc-log 2>&1
+	cd ..
+
+	echo "- Making build (may take a while)"
+	make -C libc -j $((`nproc` * 2)) > libc-log 2>&1
+
+	echo "$LIBC_MUSL_VERSION" > libc-latest
+fi
+

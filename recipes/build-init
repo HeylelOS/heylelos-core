@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -e
+umask 022
+
+echo "BUILD: init"
+
+[ -z "$INIT_CYBERD_VERSION" ] && echo 'error: Expected $INIT_CYBERD_VERSION' && exit 1
+
+cd workbench
+
+echo "- Building init"
+if [ $INIT_CYBERD_VERSION = "`cat init-latest`" ]
+then echo "- init build is up-to-date"
+else
+	if [ ! -f init/Makefile ]
+	then
+		echo "- Configurating build"
+		cd init
+		./configure -r
+		cd ..
+	fi
+
+	echo "- Making build"
+	make -C init -j $((`nproc` * 2)) > init-log 2>&1
+
+	echo "$INIT_CYBERD_VERSION" > init-latest
+fi
+

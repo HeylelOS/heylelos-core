@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -e
+umask 022
+
+echo "FETCH: init"
+
+[ -z "$INIT_CYBERD_VERSION" ] && echo 'error: Expected $INIT_CYBERD_VERSION' && exit 1
+
+cd workbench
+
+echo "- Fetching latest init"
+if [ ! -d init ]
+then
+	git clone 'https://github.com/HeylelOS/cyberd.git' init
+	touch init-latest
+fi
+
+cd init
+git pull --autostash -r origin master
+git checkout -f $INIT_CYBERD_VERSION
+cd ..
+

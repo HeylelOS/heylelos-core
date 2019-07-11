@@ -1,0 +1,52 @@
+#!/bin/sh
+
+set -e
+umask 022
+
+echo "BUILD: kernel"
+
+[ -z "$KERNEL_LINUX_VERSION" ] && echo 'error: Expected $KERNEL_LINUX_VERSION' && exit 1
+[ -z "$KERNEL_HOSTNAME" ] && echo 'error: Expected $KERNEL_HOSTNAME' && exit 1
+
+cd workbench
+
+if [ ! -f initramfs/Makefile ]
+then
+	echo "- Configurating initramfs"
+	cd initramfs
+	./configure -r > kernel-log 2>&1
+	cd ..
+fi
+
+build_initramfs() {
+	make -C initramfs build/bin/init
+	rm -rf initramfs/kernel_source
+	mkdir -p initramfs/kernel_source/dev initramfs/kernel_source/mnt
+	cp initramfs/build/bin/init initramfs/kernel_source/init
+	strip initramfs/kernel_source/init
+}
+
+echo "- Building kernel"
+if [ $KERNEL_LINUX_VERSION = "`cat kernel-latest`" ]
+then echo "- Kernel image is up-to-date"
+else
+	echo "- Building initramfs"
+	build_initramfs > kernel-log 2>&1
+
+	echo "- Distclean kernel source tree"
+	make -C kernel distclean > kernel-log 2>&1
+
+	echo "- Applying custom .config"
+	cat - "../ingredients/kernel-$ALL_TARGET_ARCH-.config" <<EOF > kernel/.config
+CONFIG_DEFAULT_HOSTNAME="$KERNEL_HOSTNAME"
+CONFIG_INITRAMFS_ROOT_UID=`id -u`
+CONFIG_INITRAMFS_ROOT_GID=`id -g`
+EOF
+
+	echo "- Making build (may take a freaking while)"
+	# yes n is here in case the kernel had options updates, so we deactivate everything unknown yet
+	yes n | make -C kernel -j $((`nproc` * 2)) >> kernel-log 2>&1
+
+	echo "$KERNEL_LINUX_VERSION" > kernel-latest
+fi
+
