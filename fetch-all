@@ -5,6 +5,5 @@ echo "- Fetching sources (may take a while depending on previous downloads)"
 ./recipes/fetch-kernel &
 ./recipes/fetch-libc &
 ./recipes/fetch-init &
-
 wait
 

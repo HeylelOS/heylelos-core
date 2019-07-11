@@ -14,7 +14,7 @@ if [ ! -f initramfs/Makefile ]
 then
 	echo "- Configurating initramfs"
 	cd initramfs
-	./configure -r > kernel-log 2>&1
+	./configure -r "CFLAGS=-arch $ALL_TARGET_ARCH -O3 -rtlib=compiler-rt" > kernel-log 2>&1
 	cd ..
 fi
 

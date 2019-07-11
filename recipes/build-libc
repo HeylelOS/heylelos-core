@@ -6,6 +6,7 @@ umask 022
 echo "BUILD: libc"
 
 [ -z "$LIBC_MUSL_VERSION" ] && echo 'error: Expected $LIBC_MUSL_VERSION' && exit 1
+[ -z "$ALL_TARGET_ARCH" ] && echo 'error: Expected $ALL_TARGET_ARCH' && exit 1
 [ -z "$ALL_TARGET_IDENTIFIER" ] && echo 'error: Expected $ALL_TARGET_IDENTIFIER' && exit 1
 
 cd workbench
@@ -22,6 +23,7 @@ else
 
 	echo "- Configurating build"
 	cd libc
+	CFLAGS="-arch $ALL_TARGET_ARCH -O3 -rtlib=compiler-rt" \
 	./configure "--prefix=/hub/musl-$LIBC_MUSL_VERSION" \
 		"--syslibdir=/library/$ALL_TARGET_IDENTIFIER" > libc-log 2>&1
 	cd ..

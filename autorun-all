@@ -8,16 +8,6 @@ echo "- Loading configuration"
 set +a
 
 ./fetch-all
-
-[ -z "$ALL_TARGET_ARCH" ] && echo 'error: Expected $ALL_TARGET_ARCH' && exit 1
-[ -z "$ALL_TARGET_IDENTIFIER" ] && echo 'error: Expected $ALL_TARGET_IDENTIFIER' && exit 1
-
-[ -z "$CC" ] && export "CC=`which clang`"
-export CFLAGS="-arch '$ALL_TARGET_ARCH' $CFLAGS"
-
-if [ -z "$CC" ]
-then echo "error: CC must be clang"
-fi
-
 ./build-all
+./package-all
 

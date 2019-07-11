@@ -1,12 +1,10 @@
 #!/bin/sh
 
-[ -z "$CC" ] && echo 'error: Expected $CC' && exit 1
-
-echo "- Building all with $CC"
+echo "- Building all"
 
 ./recipes/build-kernel &
 ./recipes/build-libc &
-./recipes/build-init &
-
 wait
+
+./recipes/build-init
 

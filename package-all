@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo "- Packaging sources"
+
+./recipes/package-kernel &
+./recipes/package-libc &
+./recipes/package-init &
+
+wait
+

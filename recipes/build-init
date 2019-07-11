@@ -6,6 +6,7 @@ umask 022
 echo "BUILD: init"
 
 [ -z "$INIT_CYBERD_VERSION" ] && echo 'error: Expected $INIT_CYBERD_VERSION' && exit 1
+[ -z "$ALL_TARGET_ARCH" ] && echo 'error: Expected $ALL_TARGET_ARCH' && exit 1
 
 cd workbench
 
@@ -17,7 +18,8 @@ else
 	then
 		echo "- Configurating build"
 		cd init
-		./configure -r
+		./configure -r "CFLAGS=-arch $ALL_TARGET_ARCH -O3 -rtlib=compiler-rt \
+		-nostdinc -I../libc/include -I../libc/obj/include -I../kernel/include" > init-log 2>&1
 		cd ..
 	fi
 
