@@ -18,12 +18,32 @@ else
 	then echo "- Built version differs from packaging one, aborting..." && exit 1
 	fi
 
-	packagedir="cyberd-$INIT_CYBERD_VERSION"
 	interp="/library/$ALL_TARGET_IDENTIFIER/ld.so"
 
-	rm -rf "$packagedir"
-	mkdir "$packagedir"
-	./tools/objconvert "$interp" ../workbench/init/build/bin/cyberd .
-	./tools/objconvert "$interp" ../workbench/init/build/bin/cyberctl .
+	[ ! -d init ] && mkdir init
+
+	../tools/objconvert "$interp" ../workbench/init/build/bin/cyberd init/cyberd
+	../tools/objconvert "$interp" ../workbench/init/build/bin/cyberctl init/cyberctl
+
+	rm -f init/package.cpio
+	../tools/cpio-entry -m 040755 -u 0 -g 0 bin >> init/package.cpio
+	../tools/cpio-entry -m 100755 -u 0 -g 0 bin/cyberd init/cyberd >> init/package.cpio
+	../tools/cpio-entry -m 100755 -u 0 -g 0 bin/cyberctl init/cyberctl >> init/package.cpio
+	../tools/cpio-entry -m 040755 -u 0 -g 0 man >> init/package.cpio
+	../tools/cpio-entry -m 100644 -u 0 -g 0 man/cyberd.1 ../workbench/init/man/cyberd.1 >> init/package.cpio
+	../tools/cpio-entry -m 100644 -u 0 -g 0 man/cyberctl.1 ../workbench/init/man/cyberctl.1 >> init/package.cpio
+	../tools/cpio-entry -m 040755 -u 0 -g 0 hny >> init/package.cpio
+	../tools/cpio-entry -m 100755 -u 0 -g 0 hny/setup ../ingredients/init-hny-setup >> init/package.cpio
+	../tools/cpio-entry -m 100755 -u 0 -g 0 hny/clean ../ingredients/init-hny-clean >> init/package.cpio
+	../tools/cpio-entry -m 100644 -u 0 -g 0 hny/eula ../workbench/init/LICENSE >> init/package.cpio
+	../tools/cpio-entry -u 0 -g 0 'TRAILER!!!' >> init/package.cpio
+
+	if xz -C crc32 < init/package.cpio > "cyberd-$INIT_CYBERD_VERSION.hny"
+	then echo "- cyberd-$INIT_CYBERD_VERSION succesfully packaged"
+	else
+		echo "- Unable to package cyberd-$INIT_CYBERD_VERSION"
+		rm "cyberd-$INIT_CYBERD_VERSION.hny"
+		exit 1
+	fi
 fi
 

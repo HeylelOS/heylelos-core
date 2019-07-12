@@ -7,7 +7,7 @@ echo "- Loading configuration"
 . ingredients/configuration
 set +a
 
-./fetch-all
-./build-all
-./package-all
+./recipes/fetch-all
+./recipes/build-all
+./recipes/package-all
 
