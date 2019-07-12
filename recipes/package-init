@@ -5,4 +5,25 @@ umask 022
 
 echo "PACKAGE: init"
 
+[ -z "$INIT_CYBERD_VERSION" ] && echo 'error: Expected $INIT_CYBERD_VERSION' && exit 1
+[ -z "$ALL_TARGET_IDENTIFIER" ] && echo 'error: Expected $ALL_TARGET_IDENTIFIER' && exit 1
+
+cd products
+
+echo "- Packaging init"
+if [ -f "cyberd-$INIT_CYBERD_VERSION.hny" ]
+then echo "- init package is up-to-date"
+else
+	if [ $INIT_CYBERD_VERSION != "`cat ../workbench/init-latest`" ]
+	then echo "- Built version differs from packaging one, aborting..." && exit 1
+	fi
+
+	packagedir="cyberd-$INIT_CYBERD_VERSION"
+	interp="/library/$ALL_TARGET_IDENTIFIER/ld.so"
+
+	rm -rf "$packagedir"
+	mkdir "$packagedir"
+	./tools/objconvert "$interp" ../workbench/init/build/bin/cyberd .
+	./tools/objconvert "$interp" ../workbench/init/build/bin/cyberctl .
+fi
 
