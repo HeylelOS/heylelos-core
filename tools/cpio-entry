@@ -1,0 +1,46 @@
+#!/bin/sh
+
+usage() {
+
+	cat <<EOF
+usage: cpio-entry [-h] [-d <dev>] [-i <ino>] [-m <mode>] [-u <uid>] [-g <gid>] [-n <nlink>] [-r <rdev>] [-t <mtime>] <name> <file>
+EOF
+
+	exit $1
+}
+
+cpio_mode=644
+cpio_uid=`id -u`
+cpio_gid=`id -g`
+cpio_nlink=1
+
+while getopts d:i:m:u:g:n:r:t: opt
+do
+	case $opt in
+	h) usage 0 ;;
+	d) cpio_dev=$OPTARG ;;
+	i) cpio_ino=$OPTARG ;;
+	m) cpio_mode=$OPTARG ;;
+	u) cpio_uid=$OPTARG ;;
+	g) cpio_gid=$OPTARG ;;
+	n) cpio_nlink=$OPTARG ;;
+	r) cpio_rdev=$OPTARG ;;
+	t) cpio_mtime=$OPTARG ;;
+	?) echo "Unknown option: $opt" && usage 1 ;;
+	esac
+done
+
+[ $(($# - $OPTIND)) -ne 1 ] && usage 1
+
+shift $((OPTIND - 1))
+read -r cpio_name cpio_file <<EOF
+$@
+EOF
+
+cpio_namesize=${#cpio_name}
+cpio_filesize=`wc -c "$cpio_file" | cut -d' ' -f1`
+
+printf '070707%.6o%.6o%.6o%.6o%.6o%.6o%.6o%.11o%.6o%.11o%s' \
+	"$cpio_dev" "$cpio_ino" "$cpio_mode" "$cpio_uid" "$cpio_gid" "$cpio_nlink" \
+	"$cpio_rdev" "$cpio_mtime" "$cpio_namesize" "$cpio_filesize" "$cpio_name" | cat - "$cpio_file"
+
