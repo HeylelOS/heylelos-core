@@ -11,16 +11,17 @@ echo "PACKAGE: init"
 cd products
 
 echo "- Packaging init"
-if [ -f "cyberd-$INIT_CYBERD_VERSION.hny" ]
+packagename="cyberd-$INIT_CYBERD_VERSION.hny"
+if [ -f $packagename ]
 then echo "- init package is up-to-date"
 else
 	if [ $INIT_CYBERD_VERSION != "`cat ../workbench/init-latest`" ]
 	then echo "- Built version differs from packaging one, aborting..." && exit 1
 	fi
 
-	interp="/library/$ALL_TARGET_IDENTIFIER/ld.so"
-
 	[ ! -d init ] && mkdir init
+
+	interp="/library/$ALL_TARGET_IDENTIFIER/ld.so"
 
 	../tools/objconvert "$interp" ../workbench/init/build/bin/cyberd init/cyberd
 	../tools/objconvert "$interp" ../workbench/init/build/bin/cyberctl init/cyberctl
@@ -38,11 +39,11 @@ else
 	../tools/cpio-entry -m 100644 -u 0 -g 0 hny/eula ../workbench/init/LICENSE >> init/package.cpio
 	../tools/cpio-entry -u 0 -g 0 'TRAILER!!!' >> init/package.cpio
 
-	if xz -C crc32 < init/package.cpio > "cyberd-$INIT_CYBERD_VERSION.hny"
-	then echo "- cyberd-$INIT_CYBERD_VERSION succesfully packaged"
+	if xz -C crc32 --lzma2 < init/package.cpio > $packagename
+	then echo "- $packagename succesfully packaged"
 	else
-		echo "- Unable to package cyberd-$INIT_CYBERD_VERSION"
-		rm "cyberd-$INIT_CYBERD_VERSION.hny"
+		echo "- Unable to package $packagename"
+		rm $packagename
 		exit 1
 	fi
 fi
