@@ -17,7 +17,7 @@ then
 fi
 
 cd init
-git pull --autostash -r origin master
-git checkout -f $INIT_CYBERD_VERSION
+git pull
+git checkout $INIT_CYBERD_VERSION
 cd ..
 

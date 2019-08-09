@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+echo "Setup $HNY_ENTRY"
+
+if [ `id -u` -ne 0 ]
+then
+	echo "This program must be run as root"
+	exit 1
+fi
+
+ln -fs "$HNY_PREFIX/$HNY_ENTRY/sbin/mkinitramfs" /sbin/mkinitramfs
+
+ln -fs "$HNY_PREFIX/$HNY_ENTRY/vmlinuz" /boot/vmlinuz
+mkinitramfs -a /boot/initrd.img -c /persistent/candidates
+

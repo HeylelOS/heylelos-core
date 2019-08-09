@@ -17,8 +17,8 @@ then
 fi
 
 cd kernel
-git pull --autostash -r origin master
-git checkout -f "v$KERNEL_LINUX_VERSION"
+git pull origin master
+git checkout "v$KERNEL_LINUX_VERSION"
 cd ..
 
 echo "- Fetching HeylelOS initramfs"

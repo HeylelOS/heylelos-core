@@ -39,6 +39,7 @@ else
 	echo "- Applying custom .config"
 	cat - "../ingredients/kernel-$ALL_TARGET_ARCH-.config" <<EOF > kernel/.config
 CONFIG_DEFAULT_HOSTNAME="$KERNEL_HOSTNAME"
+CONFIG_VERSION_SIGNATURE="HeylelOS $ALL_TARGET_ARCH `date +'%F'`"
 CONFIG_INITRAMFS_ROOT_UID=`id -u`
 CONFIG_INITRAMFS_ROOT_GID=`id -g`
 EOF

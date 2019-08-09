@@ -40,7 +40,7 @@ else
 	../tools/cpio-entry -u 0 -g 0 'TRAILER!!!' >> init/package.cpio
 
 	if xz -C crc32 --lzma2 < init/package.cpio > $packagename
-	then echo "- $packagename succesfully packaged"
+	then echo "- $packagename successfully packaged"
 	else
 		echo "- Unable to package $packagename"
 		rm $packagename
