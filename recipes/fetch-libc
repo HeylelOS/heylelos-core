@@ -18,6 +18,6 @@ fi
 
 cd libc
 git fetch --all
-git checkout "v$LIBC_MUSL_VERSION"
+git checkout -f "v$LIBC_MUSL_VERSION"
 cd ..
 

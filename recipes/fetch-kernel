@@ -18,7 +18,7 @@ fi
 
 cd kernel
 git fetch --all
-git checkout "v$KERNEL_LINUX_VERSION"
+git checkout -f "v$KERNEL_LINUX_VERSION"
 cd ..
 
 echo "- Fetching HeylelOS initramfs"

@@ -18,6 +18,6 @@ fi
 
 cd init
 git fetch --all
-git checkout $INIT_CYBERD_VERSION
+git checkout -f $INIT_CYBERD_VERSION
 cd ..
 
