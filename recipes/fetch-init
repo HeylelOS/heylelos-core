@@ -17,7 +17,7 @@ then
 fi
 
 cd init
-git pull
+git fetch --all
 git checkout $INIT_CYBERD_VERSION
 cd ..
 

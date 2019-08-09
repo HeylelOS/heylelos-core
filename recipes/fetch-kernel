@@ -17,7 +17,7 @@ then
 fi
 
 cd kernel
-git pull origin master
+git fetch --all
 git checkout "v$KERNEL_LINUX_VERSION"
 cd ..
 
@@ -29,6 +29,6 @@ then
 fi
 
 cd initramfs
-git pull
+git fetch --all
 cd ..
 

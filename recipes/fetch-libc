@@ -17,7 +17,7 @@ then
 fi
 
 cd libc
-git pull
+git fetch --all
 git checkout "v$LIBC_MUSL_VERSION"
 cd ..
 
