@@ -5,4 +5,31 @@ umask 022
 
 echo "PACKAGE: libc"
 
+[ -z "$LIBC_MUSL_VERSION" ] && echo 'error: Expected $LIBC_MUSL_VERSION' && exit 1
+[ -z "$ALL_TARGET_IDENTIFIER" ] && echo 'error: Expected $ALL_TARGET_IDENTIFIER' && exit 1
+
+cd products
+
+echo "- Packaging libc"
+packagename="musl-$LIBC_MUSL_VERSION.hny"
+if [ -f $packagename ]
+then echo "- libc package is up-to-date"
+else
+	if [ $LIBC_MUSL_VERSION != "`cat ../workbench/libc-latest`" ]
+	then echo "- Built version differs from packaging one, aborting..." && exit 1
+	fi
+
+	[ ! -d libc ] && mkdir libc
+
+	rm -f libc/package.cpio
+	../tools/cpio-entry -u 0 -g 0 'TRAILER!!!' >> libc/package.cpio
+
+	if xz -C none --lzma2 < libc/package.cpio > $packagename
+	then echo "- $packagename successfully packaged"
+	else
+		echo "- Unable to package $packagename"
+		rm -f $packagename
+		exit 1
+	fi
+fi
 

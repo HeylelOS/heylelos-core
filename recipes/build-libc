@@ -25,7 +25,7 @@ else
 	cd libc
 	CFLAGS="-arch $ALL_TARGET_ARCH -O3 -rtlib=compiler-rt" \
 	./configure "--prefix=/hub/musl-$LIBC_MUSL_VERSION" \
-		"--syslibdir=/library/$ALL_TARGET_IDENTIFIER" > libc-log 2>&1
+		"--syslibdir=/library/$ALL_TARGET_IDENTIFIER" > ../libc-log 2>&1
 	cd ..
 
 	echo "- Making build (may take a while)"
