@@ -13,5 +13,5 @@ fi
 ln -fs "$HNY_PREFIX/$HNY_ENTRY/sbin/mkinitramfs" /sbin/mkinitramfs
 
 ln -fs "$HNY_PREFIX/$HNY_ENTRY/vmlinuz" /boot/vmlinuz
-mkinitramfs -a /boot/initrd.img -c /persistent/candidates
+mkinitramfs -a /boot/initrd.img -c /data/candidates
 

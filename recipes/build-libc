@@ -15,8 +15,8 @@ echo "- Building libc"
 if [ $LIBC_MUSL_VERSION = "`cat libc-latest`" ]
 then echo "- Libc build is up-to-date"
 else
-	echo '- Applying /etc -> /persistent "patch"'
-	sed -i -e 's/\/etc/\/persistent/g' `find libc -type f`
+	echo '- Applying /etc -> /data "patch"'
+	sed -i -e 's/\/etc/\/data/g' `find libc -type f`
 
 	echo '- Applying /lib/ld-musl-$(ARCH)$(SUBARCH) -> $(syslibdir)/ld.so'
 	sed -i -e 's/LDSO_PATHNAME = .*/LDSO_PATHNAME = $(syslibdir)\/ld.so/g' libc/Makefile

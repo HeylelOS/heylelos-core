@@ -12,5 +12,5 @@ fi
 
 ln -fs "$HNY_PREFIX/$HNY_ENTRY/bin/cyberd" /sbin/init
 ln -fs "$HNY_PREFIX/$HNY_ENTRY/bin/cyberctl" /bin/cyberctl
-[ ! -d /persistent/daemons ] && mkdir /persistent/daemons
+[ ! -d /data/daemons ] && mkdir /data/daemons
 

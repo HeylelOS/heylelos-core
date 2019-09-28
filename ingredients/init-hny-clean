@@ -10,5 +10,5 @@ then
 	exit 1
 fi
 
-rm -rf /sbin/init /bin/cyberctl /persistent/daemons
+rm -rf /sbin/init /bin/cyberctl /data/daemons
 

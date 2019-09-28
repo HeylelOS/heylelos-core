@@ -21,7 +21,59 @@ else
 
 	[ ! -d libc ] && mkdir libc
 
+	cat > libc/hny-setup <<EOF
+#!/bin/sh
+
+set -e
+
+echo "Setup \$HNY_ENTRY"
+
+if [ `id -u` -ne 0 ]
+then
+	echo "This program must be run as root"
+	exit 1
+fi
+
+ln -fs "\$HNY_PREFIX/\$HNY_ENTRY/lib/libc.so" "/library/$ALL_TARGET_IDENTIFIER/ld.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/libc.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/libdl.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/libpthread.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/librt.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/libxnet.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/libcrypt.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/libm.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/libresolv.so"
+ln -fs "ld.so" "/library/$ALL_TARGET_IDENTIFIER/libutil.so"
+
+EOF
+
+	cat > libc/hny-clean <<EOF
+#!/bin/sh
+
+set -e
+
+echo "Setup \$HNY_ENTRY"
+
+if [ `id -u` -ne 0 ]
+then
+	echo "This program must be run as root"
+	exit 1
+fi
+
+rm -rf "/library/$ALL_TARGET_IDENTIFIER/ld.so" "/library/$ALL_TARGET_IDENTIFIER/libc.so"\
+	"/library/$ALL_TARGET_IDENTIFIER/libdl.so" "/library/$ALL_TARGET_IDENTIFIER/libpthread.so"\
+	"/library/$ALL_TARGET_IDENTIFIER/librt.so" "/library/$ALL_TARGET_IDENTIFIER/libxnet.so"\
+	"/library/$ALL_TARGET_IDENTIFIER/libcrypt.so" "/library/$ALL_TARGET_IDENTIFIER/libm.so"\
+	"/library/$ALL_TARGET_IDENTIFIER/libresolv.so" "/library/$ALL_TARGET_IDENTIFIER/libutil.so"
+
+EOF
+
 	rm -f libc/package.cpio
+
+	../tools/cpio-entry -m 040755 -u 0 -g 0 hny >> libc/package.cpio
+	../tools/cpio-entry -m 100755 -u 0 -g 0 hny/setup libc/hny-setup >> libc/package.cpio
+	../tools/cpio-entry -m 100755 -u 0 -g 0 hny/clean libc/hny-clean >> libc/package.cpio
+	../tools/cpio-entry -m 100644 -u 0 -g 0 hny/eula ../workbench/libc/COPYRIGHT >> libc/package.cpio
 	../tools/cpio-entry -u 0 -g 0 'TRAILER!!!' >> libc/package.cpio
 
 	if xz -C none --lzma2 < libc/package.cpio > $packagename
