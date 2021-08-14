@@ -1,0 +1,7 @@
+[submodule "materials/initrd"]
+	path = materials/initrd
+	url = https://github.com/HeylelOS/initrfs.git
+	branch = master
+[submodule "materials/kernel"]
+	path = materials/kernel
+	url = https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
