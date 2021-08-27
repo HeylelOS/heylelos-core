@@ -8,6 +8,7 @@
 	The configuration's CONFIG_INITRAMFS_SOURCE file will
 	provide the initrd.img root hierarchy structure.
 --]]
+local crucible, host, target = ...
 
 local material = hex.melt(crucible, 'materials/kernel')
 
@@ -15,7 +16,7 @@ material.dependencies = { 'initrd' };
 
 material.setup = {
 	configure = {
-		config = 'resources/kernel/config';
+		config = crucible.support.kernelconfig;
 		target = 'olddefconfig';
 	};
 	build = { options = { '-j', host.cores } };

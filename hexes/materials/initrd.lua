@@ -6,11 +6,12 @@
 	initrd.img's init binary, therefore, it comes
 	as a kernel dependency.
 --]]
+local crucible, host, target = ...
 
 local material = hex.melt(crucible, 'materials/initrd')
 
 material.setup = {
-	configure = { options = { '--toolchain', fs.path('../../..', cmaketoolchain(host, target)) } };
+	configure = { options = { '--toolchain', fs.path('../../..', crucible.support.cmaketoolchain) } };
 	build = { options = { '--parallel', host.cores } };
 }
 
